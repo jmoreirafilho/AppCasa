@@ -4,18 +4,15 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from "react";
+
 export default function HomeScreen() {
 
   // Esses ips foram fixados no ESP
   const [lights, setLights] = useState([
-    { currentState: false, name: "Copa", url: "http://192.168.18.102:81/led4_" },
-    { currentState: false, name: "Cozinha", url: "http://192.168.18.102:81/led3_" },
-    { currentState: false, name: "Cristaleira", url: "http://192.168.18.101:81/led4_" },
-    { currentState: false, name: "Entrada", url: "http://192.168.18.102:81/led2_" },
-    { currentState: false, name: "Escritório", url: "http://192.168.18.101:81/led1_" },
-    { currentState: false, name: "Lavabo", url: "http://192.168.18.101:81/led2_" },
-    { currentState: false, name: "Mesa", url: "http://192.168.18.101:81/led6_" },
-    { currentState: false, name: "Sala", url: "http://192.168.18.102:81/led1_" },
+    { currentState: false, name: "Banheiro Deck", url: "http://192.168.18.101:81/led3_" },
+    { currentState: false, name: "Deck", url: "http://192.168.18.101:81/led7_" },
+    { currentState: false, name: "Gazebo", url: "http://192.168.18.101:81/led5_" },
+    { currentState: false, name: "Quintal", url: "http://192.168.18.101:81/led8_" }
   ]);
 
   const toggle = async (index: number) => {
@@ -38,7 +35,7 @@ export default function HomeScreen() {
     <ScrollView contentContainerStyle={styles.container}>
 
       <ThemedText type="title" style={styles.title}>
-        Área Inferior
+        Área Externa
       </ThemedText>
 
       {lights.map((light, index) => (

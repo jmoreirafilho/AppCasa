@@ -4,18 +4,22 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from "react";
+
 export default function HomeScreen() {
 
   // Esses ips foram fixados no ESP
   const [lights, setLights] = useState([
-    { currentState: false, name: "Copa", url: "http://192.168.18.102:81/led4_" },
-    { currentState: false, name: "Cozinha", url: "http://192.168.18.102:81/led3_" },
-    { currentState: false, name: "Cristaleira", url: "http://192.168.18.101:81/led4_" },
-    { currentState: false, name: "Entrada", url: "http://192.168.18.102:81/led2_" },
-    { currentState: false, name: "Escritório", url: "http://192.168.18.101:81/led1_" },
-    { currentState: false, name: "Lavabo", url: "http://192.168.18.101:81/led2_" },
-    { currentState: false, name: "Mesa", url: "http://192.168.18.101:81/led6_" },
-    { currentState: false, name: "Sala", url: "http://192.168.18.102:81/led1_" },
+    { currentState: false, name: "Sanca", url: "http://192.168.18.104:81/led4_" },
+    { currentState: false, name: "Closet", url: "http://192.168.18.104:81/led3_" },
+    { currentState: false, name: "Banheiro Suite", url: "http://192.168.18.105:81/led3_" },
+    { currentState: false, name: "Nicho", url: "http://192.168.18.105:81/led4_" },
+    { currentState: false, name: "Circulação", url: "http://192.168.18.105:81/led2_" },
+    { currentState: false, name: "Suíte", url: "http://192.168.18.104:81/led1_" },
+    { currentState: false, name: "Varanda", url: "http://192.168.18.104:81/led2_" },
+    { currentState: false, name: "Quarto Visita 1", url: "http://192.168.18.103:81/led1_" },
+    { currentState: false, name: "Banheiro Visita 1", url: "http://192.168.18.103:81/led2_" },
+    { currentState: false, name: "Quarto Visita 2", url: "http://192.168.18.103:81/led3_" },
+    { currentState: false, name: "Banheiro Visita 2", url: "http://192.168.18.103:81/led4_" }
   ]);
 
   const toggle = async (index: number) => {
@@ -38,7 +42,7 @@ export default function HomeScreen() {
     <ScrollView contentContainerStyle={styles.container}>
 
       <ThemedText type="title" style={styles.title}>
-        Área Inferior
+        Área Superior
       </ThemedText>
 
       {lights.map((light, index) => (
