@@ -26,7 +26,8 @@
         "android.permission.INTERNET",
         "android.permission.ACCESS_WIFI_STATE",
         "android.permission.ACCESS_NETWORK_STATE"
-      ]
+      ],
+      "networkSecurityConfig": "./network_security_config.xml"
     },
     "web": {
       "output": "static",
