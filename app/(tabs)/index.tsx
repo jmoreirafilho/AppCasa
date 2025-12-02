@@ -1,9 +1,10 @@
-import { Alert, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 export default function HomeScreen() {
 
   // Esses ips foram fixados no ESP
@@ -18,19 +19,76 @@ export default function HomeScreen() {
     { currentState: false, name: "Sala", url: "http://192.168.18.102:81/led1_" },
   ]);
 
+  const load = async () => {
+    setLoading(true);
+    let data1 = {
+      LED4: false,
+      LED1: false,
+      LED2: false,
+      LED6: false
+    };
+    let data2 = {
+      LED12: false,
+      LED11: false,
+      LED10: false,
+      LED9: false
+    };
+
+    try {
+      const res1 = await fetch('http://192.168.18.101:81/status');
+      data1 = await res1.json();
+    } catch (error) {
+      Alert.alert("Erro ao carregar placa 1", String(error));
+    }
+
+    try {
+      const res2 = await fetch('http://192.168.18.102:81/status');
+      data2 = await res2.json();
+    } catch (error) {
+      Alert.alert("Erro ao carregar placa 2", String(error));
+    }
+
+    setLoading(false);
+
+    setLights([
+      { currentState: data2.LED12, name: "Copa", url: "http://192.168.18.102:81/led4_" },
+      { currentState: data2.LED11, name: "Cozinha", url: "http://192.168.18.102:81/led3_" },
+      { currentState: data1.LED4, name: "Cristaleira", url: "http://192.168.18.101:81/led4_" },
+      { currentState: data2.LED10, name: "Entrada", url: "http://192.168.18.102:81/led2_" },
+      { currentState: data1.LED1, name: "Escritório", url: "http://192.168.18.101:81/led1_" },
+      { currentState: data1.LED2, name: "Lavabo", url: "http://192.168.18.101:81/led2_" },
+      { currentState: data1.LED6, name: "Mesa", url: "http://192.168.18.101:81/led6_" },
+      { currentState: data2.LED9, name: "Sala", url: "http://192.168.18.102:81/led1_" },
+    ]);
+
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [])
+  );
+
+  const [loading, setLoading] = useState(false);
+
   const toggle = async (index: number) => {
+    setLoading(true);
+    const currentState = lights[index].currentState;
+    const nextState = !currentState;
+
     setLights((prev) => {
       const updated = [...prev];
-      updated[index].currentState = !updated[index].currentState;
+      updated[index].currentState = nextState;
       return updated;
     });
 
-    let url = lights[index].url + (lights[index].currentState ? 'on' : 'off');
+    let url = lights[index].url + (nextState ? 'on' : 'off');
     try {
       const req = await fetch(url);
-      Alert.alert("Sucesso", await req.text());
     } catch (error) {
       Alert.alert("Erro", String(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,6 +111,12 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ThemedView>
       ))}
+
+      {loading && (
+        <ThemedView style={styles.loaderOverlay}>
+          <ActivityIndicator size="large" color="#FFD700" />
+        </ThemedView>
+      )}
     </ScrollView>
   );
 }
@@ -106,5 +170,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: "700",
+  },
+
+  loaderOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
   },
 });

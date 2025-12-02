@@ -1,11 +1,12 @@
-import { Alert, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 
-export default function HomeScreen() {
+export default function ExternoScreen() {
 
   // Esses ips foram fixados no ESP
   const [lights, setLights] = useState([
@@ -15,19 +16,59 @@ export default function HomeScreen() {
     { currentState: false, name: "Quintal", url: "http://192.168.18.101:81/led8_" }
   ]);
 
+  const load = async () => {
+    setLoading(true);
+    let data1 = {
+      LED3: false,
+      LED7: false,
+      LED5: false,
+      LED8: false
+    };
+
+    try {
+      const res1 = await fetch('http://192.168.18.101:81/status');
+      data1 = await res1.json();
+    } catch (error) {
+      Alert.alert("Erro ao carregar placa 1", String(error));
+    }
+
+    setLoading(false);
+
+    setLights([
+      { currentState: data1.LED3, name: "Banheiro Deck", url: "http://192.168.18.101:81/led3_" },
+      { currentState: data1.LED7, name: "Deck", url: "http://192.168.18.101:81/led7_" },
+      { currentState: data1.LED5, name: "Gazebo", url: "http://192.168.18.101:81/led5_" },
+      { currentState: data1.LED8, name: "Quintal", url: "http://192.168.18.101:81/led8_" }
+    ]);
+
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [])
+  );
+
+  const [loading, setLoading] = useState(false);
+
   const toggle = async (index: number) => {
+    setLoading(true);
+    const currentState = lights[index].currentState;
+    const nextState = !currentState;
+
     setLights((prev) => {
       const updated = [...prev];
-      updated[index].currentState = !updated[index].currentState;
+      updated[index].currentState = nextState;
       return updated;
     });
 
-    let url = lights[index].url + (lights[index].currentState ? 'on' : 'off');
+    let url = lights[index].url + (nextState ? 'on' : 'off');
     try {
       const req = await fetch(url);
-      Alert.alert("Sucesso", await req.text());
     } catch (error) {
       Alert.alert("Erro", String(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,6 +91,12 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ThemedView>
       ))}
+
+      {loading && (
+        <ThemedView style={styles.loaderOverlay}>
+          <ActivityIndicator size="large" color="#FFD700" />
+        </ThemedView>
+      )}
     </ScrollView>
   );
 }
@@ -103,5 +150,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: "700",
+  },
+
+  loaderOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
   },
 });
